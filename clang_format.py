@@ -11,30 +11,7 @@ custom_style_settings = 'clang_format_custom.sublime-settings'
 
 # Hacky, but there doesn't seem to be a cleaner way to do this for now.
 # We need to be able to load all these settings from the settings file.
-all_settings  = [
-    "BasedOnStyle", "AccessModifierOffset", "AlignEscapedNewlinesLeft",
-    "AlignTrailingComments", "AllowAllParametersOfDeclarationOnNextLine",
-    "AllowShortFunctionsOnASingleLine", "AllowShortIfStatementsOnASingleLine",
-    "AllowShortLoopsOnASingleLine", "AlwaysBreakBeforeMultilineStrings",
-    "AlwaysBreakTemplateDeclarations", "BinPackParameters",
-    "BreakBeforeBinaryOperators", "BreakBeforeBraces",
-    "BreakBeforeTernaryOperators", "BreakConstructorInitializersBeforeComma",
-    "ColumnLimit", "CommentPragmas",
-    "ConstructorInitializerAllOnOneLineOrOnePerLine",
-    "ConstructorInitializerIndentWidth", "ContinuationIndentWidth",
-    "Cpp11BracedListStyle", "DerivePointerBinding",
-    "ExperimentalAutoDetectBinPacking", "IndentCaseLabels",
-    "IndentFunctionDeclarationAfterType", "IndentWidth",
-    "KeepEmptyLinesAtTheStartOfBlocks", "Language", "MaxEmptyLinesToKeep",
-    "NamespaceIndentation", "ObjCSpaceAfterProperty",
-    "ObjCSpaceBeforeProtocolList", "PenaltyBreakBeforeFirstCallParameter",
-    "PenaltyBreakComment", "PenaltyBreakFirstLessLess", "PenaltyBreakString",
-    "PenaltyExcessCharacter", "PenaltyReturnTypeOnItsOwnLine",
-    "PointerBindsToType", "SpaceBeforeAssignmentOperators", "SpaceBeforeParens",
-    "SpaceInEmptyParentheses", "SpacesBeforeTrailingComments", "SpacesInAngles",
-    "SpacesInCStyleCastParentheses", "SpacesInContainerLiterals",
-    "SpacesInParentheses", "Standard", "TabWidth", "UseTab"
-]
+all_settings  = []
 
 # Check if we are running on a Windows operating system
 os_is_windows = os.name == 'nt'
@@ -85,12 +62,32 @@ def dic_to_yaml_simple(d):
             output += ', '
     return output
 
+
+def load_all_settings():
+    command = [binary, '-dump-config']
+    p = subprocess.Popen(command, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    settings = []
+    for l in p.stdout:
+        ul = l.decode('ascii').strip()
+        if ul.startswith(u'#'):
+            continue
+        if u':' not in ul:
+            continue
+        key_ = ul.split(u':', 1)[0]
+        settings.append(key_)
+    return settings
+
+
 # We store a set of customised values in a sublime settings file, so that it is
 # possible to very quickly customise the output.
 # This function returns the correct customised style tag.
 def load_custom():
     custom_settings = sublime.load_settings(custom_style_settings)
     keys = dict()
+    global all_settings
+    if not all_settings:
+        all_settings = load_all_settings()
     for v in all_settings:
         result = custom_settings.get(v, None)
         if result != None:
