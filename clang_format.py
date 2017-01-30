@@ -1,10 +1,12 @@
-import sublime, sublime_plugin
-import subprocess, os
+import sublime
+import sublime_plugin
+import subprocess
+import os
 
 
 # The styles available by default. We add one option: "Custom". This tells
 # the plugin to look in an ST settings file to load the customised style.
-styles  = ["LLVM", "Google", "Chromium", "Mozilla", "WebKit", "Custom", "File"]
+styles = ["LLVM", "Google", "Chromium", "Mozilla", "WebKit", "Custom", "File"]
 
 
 # Settings file locations.
@@ -14,45 +16,45 @@ custom_style_settings = 'clang_format_custom.sublime-settings'
 
 # Hacky, but there doesn't seem to be a cleaner way to do this for now.
 # We need to be able to load all these settings from the settings file.
-all_settings  = []
+all_settings = []
 
 st_encodings_trans = {
-   "UTF-8" : "utf-8",
-   "UTF-8 with BOM" : "utf-8-sig",
-   "UTF-16 LE" : "utf-16-le",
-   "UTF-16 LE with BOM" : "utf-16",
-   "UTF-16 BE" : "utf-16-be",
-   "UTF-16 BE with BOM" : "utf-16",
-   "Western (Windows 1252)" : "cp1252",
-   "Western (ISO 8859-1)" : "iso8859-1",
-   "Western (ISO 8859-3)" : "iso8859-3",
-   "Western (ISO 8859-15)" : "iso8859-15",
-   "Western (Mac Roman)" : "mac-roman",
-   "DOS (CP 437)" : "cp437",
-   "Arabic (Windows 1256)" : "cp1256",
-   "Arabic (ISO 8859-6)" : "iso8859-6",
-   "Baltic (Windows 1257)" : "cp1257",
-   "Baltic (ISO 8859-4)" : "iso8859-4",
-   "Celtic (ISO 8859-14)" : "iso8859-14",
-   "Central European (Windows 1250)" : "cp1250",
-   "Central European (ISO 8859-2)" : "iso8859-2",
-   "Cyrillic (Windows 1251)" : "cp1251",
-   "Cyrillic (Windows 866)" : "cp866",
-   "Cyrillic (ISO 8859-5)" : "iso8859-5",
-   "Cyrillic (KOI8-R)" : "koi8-r",
-   "Cyrillic (KOI8-U)" : "koi8-u",
-   "Estonian (ISO 8859-13)" : "iso8859-13",
-   "Greek (Windows 1253)" : "cp1253",
-   "Greek (ISO 8859-7)" : "iso8859-7",
-   "Hebrew (Windows 1255)" : "cp1255",
-   "Hebrew (ISO 8859-8)" : "iso8859-8",
-   "Nordic (ISO 8859-10)" : "iso8859-10",
-   "Romanian (ISO 8859-16)" : "iso8859-16",
-   "Turkish (Windows 1254)" : "cp1254",
-   "Turkish (ISO 8859-9)" : "iso8859-9",
-   "Vietnamese (Windows 1258)" :  "cp1258",
-   "Hexadecimal" : None,
-   "Undefined" : None
+   "UTF-8": "utf-8",
+   "UTF-8 with BOM": "utf-8-sig",
+   "UTF-16 LE": "utf-16-le",
+   "UTF-16 LE with BOM": "utf-16",
+   "UTF-16 BE": "utf-16-be",
+   "UTF-16 BE with BOM": "utf-16",
+   "Western (Windows 1252)": "cp1252",
+   "Western (ISO 8859-1)": "iso8859-1",
+   "Western (ISO 8859-3)": "iso8859-3",
+   "Western (ISO 8859-15)": "iso8859-15",
+   "Western (Mac Roman)": "mac-roman",
+   "DOS (CP 437)": "cp437",
+   "Arabic (Windows 1256)": "cp1256",
+   "Arabic (ISO 8859-6)": "iso8859-6",
+   "Baltic (Windows 1257)": "cp1257",
+   "Baltic (ISO 8859-4)": "iso8859-4",
+   "Celtic (ISO 8859-14)": "iso8859-14",
+   "Central European (Windows 1250)": "cp1250",
+   "Central European (ISO 8859-2)": "iso8859-2",
+   "Cyrillic (Windows 1251)": "cp1251",
+   "Cyrillic (Windows 866)": "cp866",
+   "Cyrillic (ISO 8859-5)": "iso8859-5",
+   "Cyrillic (KOI8-R)": "koi8-r",
+   "Cyrillic (KOI8-U)": "koi8-u",
+   "Estonian (ISO 8859-13)": "iso8859-13",
+   "Greek (Windows 1253)": "cp1253",
+   "Greek (ISO 8859-7)": "iso8859-7",
+   "Hebrew (Windows 1255)": "cp1255",
+   "Hebrew (ISO 8859-8)": "iso8859-8",
+   "Nordic (ISO 8859-10)": "iso8859-10",
+   "Romanian (ISO 8859-16)": "iso8859-16",
+   "Turkish (Windows 1254)": "cp1254",
+   "Turkish (ISO 8859-9)": "iso8859-9",
+   "Vietnamese (Windows 1258)":  "cp1258",
+   "Hexadecimal": None,
+   "Undefined": None
 }
 
 
@@ -94,7 +96,7 @@ def set_path(path):
 # We avoid dependencies on yaml, since the output we need is very simple.
 def dic_to_yaml_simple(d):
     output = ""
-    n      = len(d)
+    n = len(d)
     for k in d:
         output += str(k)
         output += ": "
@@ -103,7 +105,7 @@ def dic_to_yaml_simple(d):
         else:
             output += str(d[k])
         n -= 1
-        if (n!=0):
+        if (n != 0):
             output += ', '
     return output
 
@@ -135,7 +137,7 @@ def load_custom():
         all_settings = load_all_settings()
     for v in all_settings:
         result = custom_settings.get(v, None)
-        if result != None:
+        if result is not None:
             keys[v] = result
     out = "-style={" + dic_to_yaml_simple(keys) + "}"
 
@@ -152,9 +154,9 @@ def update_path():
 # Check that the binary can be found and is executable.
 def check_binary():
     # If we couldn't find the binary.
-    if (which(binary) == None):
+    if (which(binary) is None):
         # Try to guess the correct setting.
-        if (which(default_binary) != None):
+        if (which(default_binary) is not None):
             # Looks like clang-format is in the path, remember that.
             set_path(default_binary)
             return True
@@ -177,29 +179,33 @@ def load_settings():
     global format_on_save
     global languages
     settings_global = sublime.load_settings(settings_file)
-    settings_local = sublime.active_window().active_view().settings().get('ClangFormat', {})
-    load = lambda name, default: settings_local.get(name, settings_global.get(name, default))
+    settings_local = sublime.active_window().active_view().settings().get(
+        'ClangFormat', {})
+    load = lambda name, default: settings_local.get(
+        name, settings_global.get(name, default))
     # Load settings, with defaults.
-    binary         = load('binary', default_binary)
-    style          = load('style', styles[0])
+    binary = load('binary', default_binary)
+    style = load('style', styles[0])
     format_on_save = load('format_on_save', False)
-    languages      = load('languages', ['C', 'C++', 'C++11', 'JavaScript'])
+    languages = load('languages', ['C', 'C++', 'C++11', 'JavaScript'])
 
 
 def is_supported(lang):
     load_settings()
-    return any((lang.endswith((l + '.tmLanguage', l + '.sublime-syntax')) for l in languages))
+    return any((lang.endswith((l + '.tmLanguage', l + '.sublime-syntax'))
+                for l in languages))
 
 
 # Triggered when the user runs clang format.
 class ClangFormatCommand(sublime_plugin.TextCommand):
+
     def run(self, edit, whole_buffer=False):
         load_settings()
 
         if not check_binary():
             return
 
-        sublime.status_message("Clang format (style: "+ style + ")." )
+        sublime.status_message("Clang format (style: " + style + ").")
 
         # The below code has been taken and tweaked from llvm.
         encoding = st_encodings_trans[self.view.encoding()]
@@ -234,15 +240,15 @@ class ClangFormatCommand(sublime_plugin.TextCommand):
             # If the command is run at the end of the line,
             # Run the command on the whole line.
             if view.classify(region_offset) & sublime.CLASS_LINE_END > 0:
-                region        = view.line(region_offset)
+                region = view.line(region_offset)
                 region_offset = region.begin()
-                region_lenth  = region.size()
+                region_lenth = region.size()
 
             command.extend(['-offset', str(region_offset),
                             '-length', str(region_length)])
 
         # We only set the offset once, otherwise CF complains.
-        command.extend(['-assume-filename', str(self.view.file_name())] )
+        command.extend(['-assume-filename', str(self.view.file_name())])
 
         # TODO: Work out what this does.
         # command.extend(['-output-replacements-xml'])
@@ -253,9 +259,9 @@ class ClangFormatCommand(sublime_plugin.TextCommand):
         if os_is_windows:
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        p   = subprocess.Popen(command, stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE, stdin=subprocess.PIPE,
-                               startupinfo=startupinfo)
+        p = subprocess.Popen(command, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, stdin=subprocess.PIPE,
+                             startupinfo=startupinfo)
         output, error = p.communicate(buf.encode(encoding))
 
         # Display any errors returned by clang-format using a message box,
@@ -282,6 +288,7 @@ class ClangFormatCommand(sublime_plugin.TextCommand):
 
 # Hook for on-save event, to allow application of clang-format on save.
 class clangFormatEventListener(sublime_plugin.EventListener):
+
     def on_pre_save(self, view):
         # Only do this for supported languages
         syntax = view.settings().get('syntax')
@@ -295,12 +302,14 @@ class clangFormatEventListener(sublime_plugin.EventListener):
 
 # Called from the UI to update the path in the settings.
 class clangFormatSetPathCommand(sublime_plugin.WindowCommand):
+
     def run(self):
         update_path()
 
 
 # Called from the UI to set the current style.
 class clangFormatSelectStyleCommand(sublime_plugin.WindowCommand):
+
     def done(self, i):
         settings = sublime.load_settings(settings_file)
         settings.set("style", styles[i])
