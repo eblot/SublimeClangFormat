@@ -100,6 +100,7 @@
     //     DRTBS_TopLevel (in configuration: TopLevel) Always break after the return types
     //     of top level functions.
 //  "AlwaysBreakAfterDefinitionReturnType": "None",
+//  "AlwaysBreakAfterReturnType": "None",
 
     // If true, always break before multiline string literals.
     // This flag is mean to make cases where there are multiple multiline 
@@ -134,7 +135,25 @@
     // bool BeforeCatch Wrap before catch.
     // bool BeforeElse Wrap before else.
     // bool IndentBraces Indent the wrapped braces themselves.
-// "BraceWrapping": "IndentBraces",
+    // bool SplitEmptyFunction If false, empty function body can be put on a single line.
+    // bool SplitEmptyRecord If false, empty record (e.g. class, struct or union) body can be put on a single line.
+    // bool SplitEmptyNamespace If false, empty namespace body can be put on a single line.
+    "BraceWrapping":{
+//        "AfterClass":             false,
+//        "AfterControlStatement":  false,
+//        "AfterEnum":              false,
+//        "AfterFunction":          false,
+//        "AfterNamespace":         false,
+//        "AfterObjCDeclaration":   false,
+//        "AfterStruct":            false,
+//        "AfterUnion":             false,
+//        "BeforeCatch":            false,
+//        "BeforeElse":             false,
+//        "IndentBraces":           false,
+//        "SplitEmptyFunction:"     true,
+//        "SplitEmptyRecord":       true,
+//        "SplitEmptyNamespace":    true
+    },
 
     // Break after each annotation on a field in Java files.
 // "BreakAfterJavaFieldAnnotations": true,
@@ -325,7 +344,7 @@
     //     PAS_Left   (in configuration: Left) Align pointer to the left.
     //     PAS_Right  (in configuration: Right) Align pointer to the right.
     //     PAS_Middle (in configuration: Middle) Align pointer in the middle.
-//  "PointerAlignment": "PAS_Left",
+//  "PointerAlignment": "Left",
 
     // If true, a space may be inserted after C style casts.
 // "SpaceAfterCStyleCast": true,
